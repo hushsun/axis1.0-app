@@ -87,6 +87,8 @@ export default function App() {
     setShowPostModal(false); setNewPost({ header: '', description: '', images: [], tag: '现场' });
   };
 
+  
+  
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex justify-center sm:py-10 font-sans selection:bg-sky-100">
       <div className="w-full max-w-[400px] bg-white h-[100dvh] sm:h-[800px] sm:rounded-[40px] shadow-2xl relative flex flex-col overflow-hidden border-x border-slate-200">
