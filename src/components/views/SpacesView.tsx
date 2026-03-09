@@ -5,9 +5,11 @@ import { useAppStore } from '../../store/useAppStore';
 export const SpacesView: React.FC = () => {
   const { 
     spaces, activeSpace, setActiveSpace, isManagingSpaces, setIsManagingSpaces, 
-    requirements, currentUser, handleVote, submitCounterProposal, deleteSpace,
+    requirements, currentUser, handleVote, submitCounterProposal, deleteSpace, deleteRequirement,
     setShowAddSpaceModal, inputText, setInputText, addRequirement
   } = useAppStore();
+
+  const [isEditingRequirements, setIsEditingRequirements] = useState(false);
 
   React.useEffect(() => {
     if (spaces.length > 0 && (!activeSpace || !spaces.find((s: any) => s.id === activeSpace.id))) {
@@ -47,7 +49,12 @@ export const SpacesView: React.FC = () => {
       </div>
       
       <div className="space-y-4 pt-4 border-t border-slate-100">
-        <h3 className="text-xl font-black italic text-slate-900">{activeSpace?.name || 'Loading'} 的想法</h3>
+        <div className="flex justify-between items-center mb-4 px-1">
+          <h3 className="text-xl font-black italic text-slate-900">{activeSpace?.name || 'Loading'} 的想法</h3>
+          <button onClick={() => setIsEditingRequirements(!isEditingRequirements)} className={`p-2 rounded-xl transition-all ${isEditingRequirements ? 'bg-red-50 text-red-500' : 'bg-slate-100 text-slate-400 hover:text-slate-900'}`}>
+            <Settings2 size={16} />
+          </button>
+        </div>
         {requirements.filter((r: any) => r.spaceId === activeSpace?.id).length === 0 && (
           <div className="py-20 text-center opacity-40 italic text-sm font-bold text-slate-400">暂无执念...</div>
         )}
@@ -55,11 +62,15 @@ export const SpacesView: React.FC = () => {
           const isLocked = req.status === 'locked'; 
           const creatorInfo = getUserInfo(req.creatorId); 
           const isAuthor = req.creatorId === currentUser.id;
-          // Only the person who did NOT create the current proposal can vote.
           const canVote = !isAuthor;
           
           return (
-            <div key={req.id} className={`p-5 rounded-[28px] border transition-all ${isLocked ? 'bg-slate-50 border-slate-200' : req.status === 'unresolved' ? 'bg-red-50 border-red-100' : req.status === 'disputed' ? 'bg-orange-50/50 border-orange-100 shadow-sm' : 'bg-white border-slate-100 shadow-sm'}`}>
+            <div key={req.id} className={`p-5 rounded-[28px] border transition-all relative overflow-hidden ${isLocked ? 'bg-slate-50 border-slate-200' : req.status === 'unresolved' ? 'bg-red-50 border-red-100' : req.status === 'disputed' ? 'bg-orange-50/50 border-orange-100 shadow-sm' : 'bg-white border-slate-100 shadow-sm'}`}>
+              {isEditingRequirements && isAuthor && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center animate-in fade-in z-20" onClick={e => e.stopPropagation()}>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); deleteRequirement(req.id); }} className="p-4 bg-red-500 text-white rounded-full shadow-xl active:scale-90 transition-transform"><Trash2 size={24}/></button>
+                </div>
+              )}
               <div className="flex justify-between items-center mb-4 border-b border-slate-100/50 pb-3">
                 <div className="flex items-center gap-2">
                   {creatorInfo.avatar ? <img src={creatorInfo.avatar} className="w-5 h-5 rounded-full object-cover shadow-sm" alt="avatar" /> : <span className={`w-2 h-2 rounded-full ${creatorInfo.color}`}></span>}
@@ -98,14 +109,23 @@ export const SpacesView: React.FC = () => {
                 <div className="mt-4 pt-4 border-t border-orange-100 animate-in slide-in-from-top-2">
                   <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2 italic font-bold">输入修正建议 / ROUND {req.currentRound}：</p>
                   <div className="flex gap-2">
-                    <input type="text" value={counterProposalText} onChange={e => setCounterProposalText(e.target.value)} placeholder="输入修正后的 Plan B..." className="flex-1 bg-white border border-orange-200 rounded-xl px-4 py-2 text-[16px] focus:ring-1 focus:ring-orange-400 outline-none shadow-inner" />
-                    <button onClick={() => { submitCounterProposal(req.id, counterProposalText); setCounterProposalText(''); }} className="bg-orange-500 text-white px-4 rounded-xl shadow-lg active:scale-90 transition-transform font-black"><Send size={16}/></button>
+                    <input type="text" value={counterProposalText} onChange={e => setCounterProposalText(e.target.value)} className="flex-1 bg-white border border-orange-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400 shadow-inner" placeholder="提出新的方案..." />
+                    <button onClick={() => { submitCounterProposal(req.id, counterProposalText); setCounterProposalText(''); }} disabled={!counterProposalText.trim()} className="bg-orange-500 text-white p-2 rounded-xl shadow-md active:scale-90 disabled:opacity-50"><Send size={16}/></button>
                   </div>
                 </div>
               )}
             </div>
-          ); 
+          );
         })}
+      </div>
+      
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[360px] px-5 z-40">
+        <form onSubmit={addRequirement} className="bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-slate-100 flex gap-2 items-center">
+          <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} className="flex-1 bg-transparent border-none px-4 py-2 text-sm outline-none font-bold placeholder:font-normal" placeholder={`添加 ${activeSpace?.name || ''} 的执念...`} />
+          <button type="submit" disabled={!inputText.trim()} className="bg-slate-900 text-white p-3 rounded-full shadow-md active:scale-90 transition-transform disabled:opacity-50 disabled:active:scale-100">
+            <Plus size={18}/>
+          </button>
+        </form>
       </div>
     </div>
   );
