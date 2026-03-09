@@ -131,6 +131,7 @@ export default function App() {
           </div>
         )}
 
+
         {/* FAB for Feed */}
         {activeTab === 'feed' && (
           <button onClick={() => setShowPostModal(true)} className="absolute bottom-[100px] right-6 w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40">
