@@ -67,6 +67,7 @@ interface AppState {
   addRequirement: (e: React.FormEvent) => Promise<void>;
   handleVote: (reqId: string, vote: string) => Promise<void>;
   submitCounterProposal: (reqId: string, text: string) => Promise<void>;
+  deleteRequirement: (id: string) => Promise<void>;
   deleteSpace: (id: string) => Promise<void>;
   confirmBudget: (agree: boolean) => Promise<void>;
 
@@ -193,6 +194,20 @@ export const useAppStore = create<AppState>((set, get) => ({
     
     set({ requirements: state.requirements.map(r => r.id === reqId ? { ...r, ...updatedReq } : r) });
     await state.updateDocSupabase('requirements', reqId, updatedReq);
+  },
+
+  deleteRequirement: async (id) => {
+    const state = get();
+    const req = state.requirements.find(r => r.id === id);
+    if (!req) return;
+    
+    if (req.creatorId !== state.currentUser.id) {
+      state.setGlobalMsg("只能删除自己的提案。");
+      return;
+    }
+
+    set({ requirements: state.requirements.filter(r => r.id !== id) });
+    await state.deleteDocSupabase('requirements', id);
   },
 
   deleteSpace: async (id) => {
@@ -340,25 +355,3 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   }
 }));
-import { create } from 'zustand';
-
-// ... (此处保留你原有的 AppState 接口定义，确保包含 deleteRequirement) ...
-// 确保接口中包含: deleteRequirement: (id: string) => Promise<void>;
-
-export const useAppStore = create<AppState>((set, get) => ({
-  // ... (保留你原有的所有状态和函数实现) ...
-
-  // 确保包含以下实现:
-  deleteRequirement: async (id) => {
-    const state = get();
-    const req = state.requirements.find(r => r.id === id);
-    if (!req) return;
-    
-    if (req.creatorId !== state.currentUser.id) {
-      state.setGlobalMsg("只能删除自己的提案。");
-      return;
-    }
-
-    set({ requirements: state.requirements.filter(r => r.id !== id) });
-    await state.deleteDocSupabase('requirements', id);
-  },

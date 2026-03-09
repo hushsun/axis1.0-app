@@ -1,3 +1,4 @@
+// src/components/views/SpacesView.tsx
 import React, { useState } from 'react';
 import { Settings2, Plus, Trash2, Check, AlertTriangle, CornerDownRight, XCircle, CheckCircle2, Send } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
@@ -109,13 +110,13 @@ export const SpacesView: React.FC = () => {
                 <div className="mt-4 pt-4 border-t border-orange-100 animate-in slide-in-from-top-2">
                   <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2 italic font-bold">输入修正建议 / ROUND {req.currentRound}：</p>
                   <div className="flex gap-2">
-                    <input type="text" value={counterProposalText} onChange={e => setCounterProposalText(e.target.value)} className="flex-1 bg-white border border-orange-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400 shadow-inner" placeholder="提出新的方案..." />
-                    <button onClick={() => { submitCounterProposal(req.id, counterProposalText); setCounterProposalText(''); }} disabled={!counterProposalText.trim()} className="bg-orange-500 text-white p-2 rounded-xl shadow-md active:scale-90 disabled:opacity-50"><Send size={16}/></button>
+                    <input type="text" value={counterProposalText} onChange={e => setCounterProposalText(e.target.value)} placeholder="输入修正后的 Plan B..." className="flex-1 bg-white border border-orange-200 rounded-xl px-4 py-2 text-[16px] focus:ring-1 focus:ring-orange-400 outline-none shadow-inner" />
+                    <button onClick={() => { submitCounterProposal(req.id, counterProposalText); setCounterProposalText(''); }} className="bg-orange-500 text-white px-4 rounded-xl shadow-lg active:scale-90 transition-transform font-black"><Send size={16}/></button>
                   </div>
                 </div>
               )}
             </div>
-          );
+          ); 
         })}
       </div>
       
