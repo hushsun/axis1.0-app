@@ -83,7 +83,7 @@ export const CategoryDetailView: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-1">
                     <button onClick={() => setEditModal({ type: 'edit_item_full', title: '编辑子项', catId: category.id, itemId: item.id, name: item.name, val1: item.budget, val2: item.actual })} className="p-1.5 text-slate-300 hover:text-slate-900 transition-colors"><Pencil size={14}/></button>
                     <button onClick={() => deleteItem(item.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
                   </div>

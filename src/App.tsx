@@ -87,8 +87,6 @@ export default function App() {
     setShowPostModal(false); setNewPost({ header: '', description: '', images: [], tag: '现场' });
   };
 
-  
-  
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex justify-center sm:py-10 font-sans selection:bg-sky-100">
       <div className="w-full max-w-[400px] bg-white h-[100dvh] sm:h-[800px] sm:rounded-[40px] shadow-2xl relative flex flex-col overflow-hidden border-x border-slate-200">
@@ -130,7 +128,6 @@ export default function App() {
             </form>
           </div>
         )}
-
 
         {/* FAB for Feed */}
         {activeTab === 'feed' && (
@@ -331,7 +328,7 @@ export default function App() {
                       {newPost.images.map(img => (
                         <div key={img.id} className="relative aspect-square rounded-lg overflow-hidden">
                           <img src={img.url} className="w-full h-full object-cover" alt="preview" />
-                          <button type="button" onClick={() => setNewPost({...newPost, images: newPost.images.filter(i=>i.id !== img.id)})} className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"><Trash2 size={16}/></button>
+                          <button type="button" onClick={() => setNewPost({...newPost, images: newPost.images.filter(i=>i.id !== img.id)})} className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-100 transition-opacity"><Trash2 size={16}/></button>
                         </div>
                       ))}
                       {newPost.images.length < 9 && (
