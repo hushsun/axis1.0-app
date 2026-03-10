@@ -148,16 +148,6 @@ export default function App() {
           {activeTab === 'feed' && <FeedView />}
         </main>
 
-        {/* Floating Input for Spaces */}
-        {activeTab === 'spaces' && !isManagingSpaces && (
-          <div className="absolute bottom-[80px] left-0 right-0 z-40 bg-gradient-to-t from-slate-100 via-slate-100/90 to-transparent pt-6 pb-4 px-5 pointer-events-none">
-            <form onSubmit={addRequirement} className="bg-white/95 backdrop-blur-xl p-2 rounded-[32px] border border-slate-200 shadow-xl flex gap-2 pointer-events-auto">
-              <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} placeholder={`对【${activeSpace?.name || ''}】的执念...`} className="flex-1 bg-transparent border-none px-5 py-4 text-[16px] font-bold focus:ring-0 outline-none placeholder:text-slate-300 italic" />
-              <button type="submit" disabled={!inputText.trim()} className="bg-slate-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform disabled:opacity-20 font-bold shrink-0"><Send size={20} /></button>
-            </form>
-          </div>
-        )}
-
         {/* FAB for Feed */}
         {activeTab === 'feed' && (
           <button onClick={() => setShowPostModal(true)} className="absolute bottom-[100px] right-6 w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40">
