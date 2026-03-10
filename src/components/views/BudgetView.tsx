@@ -12,7 +12,7 @@ export const BudgetView: React.FC = () => {
   const spentTotal = useMemo(() => categories.reduce((sum: number, cat: any) => sum + cat.items.reduce((s: number, i: any) => s + (i.actual || 0), 0), 0), [categories]);
   const planTotalSum = useMemo(() => categories.reduce((sum: number, cat: any) => sum + cat.items.reduce((s: number, i: any) => s + i.budget, 0), 0), [categories]);
   const committedTotal = useMemo(() => categories.reduce((sum: number, cat: any) => sum + cat.items.reduce((s: number, i: any) => s + (i.actual === 0 ? i.budget : 0), 0), 0), [categories]);
-  const displayTotalBudget = useMemo(() => totalBudgetState.proposal ? totalBudgetState.proposal.value : planTotalSum, [totalBudgetState, planTotalSum]);
+  const displayTotalBudget = useMemo(() => totalBudgetState.status === 'pending' && totalBudgetState.proposal ? totalBudgetState.proposal.value : totalBudgetState.value, [totalBudgetState]);
   const remainingTotal = Math.max(0, displayTotalBudget - spentTotal - committedTotal);
   const isPlanOverBudget = planTotalSum > displayTotalBudget;
 
@@ -36,7 +36,18 @@ export const BudgetView: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="text-4xl font-black tracking-tighter text-slate-900 font-mono italic">¥{planTotalSum.toLocaleString()}</div>
+          <div className="flex items-center justify-between">
+            <div className="text-4xl font-black tracking-tighter text-slate-900 font-mono italic">¥{totalBudgetState.value.toLocaleString()}</div>
+            <button onClick={() => setEditModal({ type: 'total_budget', title: '修改总预算', val1: totalBudgetState.value })} className="p-2 text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-full">
+              <Pencil size={18} />
+            </button>
+          </div>
+        )}
+        {isPlanOverBudget && (
+          <div className="mt-4 flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 p-3 rounded-2xl border border-red-100 animate-in fade-in">
+            <AlertTriangle size={16} />
+            <span>大类规划总额 (¥{planTotalSum.toLocaleString()}) 已超出总预算！</span>
+          </div>
         )}
       </div>
       
