@@ -1,4 +1,3 @@
-// src/components/views/SpacesView.tsx
 import React, { useState } from 'react';
 import { Settings2, Plus, Trash2, Check, AlertTriangle, CornerDownRight, XCircle, CheckCircle2, Send } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
@@ -63,6 +62,7 @@ export const SpacesView: React.FC = () => {
           const isLocked = req.status === 'locked'; 
           const creatorInfo = getUserInfo(req.creatorId); 
           const isAuthor = req.creatorId === currentUser.id;
+          // Only the person who did NOT create the current proposal can vote.
           const canVote = !isAuthor;
           
           return (
@@ -118,15 +118,6 @@ export const SpacesView: React.FC = () => {
             </div>
           ); 
         })}
-      </div>
-      
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[360px] px-5 z-40">
-        <form onSubmit={addRequirement} className="bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border border-slate-100 flex gap-2 items-center">
-          <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} className="flex-1 bg-transparent border-none px-4 py-2 text-sm outline-none font-bold placeholder:font-normal" placeholder={`添加 ${activeSpace?.name || ''} 的执念...`} />
-          <button type="submit" disabled={!inputText.trim()} className="bg-slate-900 text-white p-3 rounded-full shadow-md active:scale-90 transition-transform disabled:opacity-50 disabled:active:scale-100">
-            <Plus size={18}/>
-          </button>
-        </form>
       </div>
     </div>
   );
