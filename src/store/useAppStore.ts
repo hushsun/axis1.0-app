@@ -3,6 +3,8 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 
 interface AppState {
+  isAppLoaded: boolean;
+  dbError: boolean;
   globalMsg: string;
   setGlobalMsg: (msg: string) => void;
 
@@ -82,6 +84,8 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
+  isAppLoaded: false,
+  dbError: false,
   globalMsg: '',
   setGlobalMsg: (msg) => set({ globalMsg: msg }),
 
@@ -232,11 +236,17 @@ export const useAppStore = create<AppState>((set, get) => ({
         get().setGlobalMsg("数据库未初始化！请在 Supabase 执行建表 SQL。");
       } else {
         console.error("Supabase error:", error);
+        set({ dbError: true });
+        get().setGlobalMsg("网络错误，无法连接到数据库。");
       }
+      set({ isAppLoaded: true });
       return;
     }
 
-    if (!data) return;
+    if (!data) {
+      set({ isAppLoaded: true });
+      return;
+    }
 
     const grouped = data.reduce((acc: any, row: any) => {
       if(!acc[row.collection]) acc[row.collection] = [];
@@ -266,6 +276,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       Object.keys(map).forEach(k => map[k].sort((a, b) => b.timestamp - a.timestamp));
       set({ intentImages: map });
     }
+    
+    set({ isAppLoaded: true });
   },
 
   setupRealtime: () => {

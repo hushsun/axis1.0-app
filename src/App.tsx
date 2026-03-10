@@ -14,7 +14,7 @@ import { compressImage } from './lib/utils';
 
 export default function App() {
   const { 
-    currentUser, setCurrentUser, fetchInitial, globalMsg, setGlobalMsg,
+    isAppLoaded, currentUser, setCurrentUser, fetchInitial, globalMsg, setGlobalMsg,
     activeTab, setActiveTab, setIsManagingSpaces, setIsManagingCategories, setIsManagingTimeline,
     activeSpace, inputText, setInputText, addRequirement,
     previewImage, setPreviewImage, feedPosts, setFeedPosts, setDocSupabase, updateDocSupabase,
@@ -37,6 +37,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const savedUser = localStorage.getItem('axis_user');
+    if (savedUser) {
+      try {
+        setCurrentUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Failed to parse saved user", e);
+      }
+    }
+    
     fetchInitial();
     const cleanup = useAppStore.getState().setupRealtime();
     return cleanup;
@@ -48,6 +57,26 @@ export default function App() {
       return () => clearTimeout(t); 
     }
   }, [globalMsg, setGlobalMsg]);
+
+  useEffect(() => {
+    if (isAppLoaded && currentUser && !useAppStore.getState().projectUsers) {
+      setCurrentUser(null);
+      if (!useAppStore.getState().dbError) {
+        localStorage.removeItem('axis_user');
+      }
+    }
+  }, [isAppLoaded, currentUser, setCurrentUser]);
+
+  if (!isAppLoaded) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans text-slate-900">
+        <div className="flex flex-col items-center gap-4 animate-pulse">
+          <AxisLogo size="lg" />
+          <p className="text-xs font-bold text-slate-400 tracking-widest uppercase">Loading Axis...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentUser) {
     return <LoginView />;

@@ -7,7 +7,7 @@ import { compressImage } from '../../lib/utils';
 import getCroppedImg from '../../lib/cropImage';
 
 export const LoginView: React.FC = () => {
-  const { projectUsers, setProjectUsers, setCurrentUser, setGlobalMsg, updateDocSupabase, setDocSupabase, fetchInitial } = useAppStore();
+  const { dbError, projectUsers, setProjectUsers, setCurrentUser, setGlobalMsg, updateDocSupabase, setDocSupabase, fetchInitial } = useAppStore();
   const [view, setView] = useState('login');
   const [loginInput, setLoginInput] = useState('');
   const [loginAvatar, setLoginAvatar] = useState<string | null>(null);
@@ -23,6 +23,10 @@ export const LoginView: React.FC = () => {
 
   const handleSetup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (dbError) {
+      setGlobalMsg("数据库连接失败，无法初始化项目。");
+      return;
+    }
     if (!setupInput.manager || !setupInput.partner) return;
     
     setGlobalMsg("正在初始化项目，请稍候...");
@@ -238,8 +242,12 @@ export const LoginView: React.FC = () => {
       localStorage.setItem('axis_user', JSON.stringify(updatedUser));
     } else {
       if (!projectUsers || Object.keys(projectUsers).length === 0) {
-          setGlobalMsg('需要初始化项目注册！');
-          setView('setup');
+          if (dbError) {
+            setGlobalMsg('网络错误，无法连接到数据库。');
+          } else {
+            setGlobalMsg('需要初始化项目注册！');
+            setView('setup');
+          }
       } else {
           setGlobalMsg('身份未识别，请输入主理人或合伙人的姓名');
       }
@@ -254,7 +262,7 @@ export const LoginView: React.FC = () => {
           <h1 className="text-2xl font-black mt-6 italic">Axis 共线</h1>
           <p className="text-slate-400 text-[10px] mt-2 uppercase tracking-[0.2em] font-bold">Consensus Decision Ledger</p>
         </div>
-        {(!projectUsers && view !== 'login') || view === 'setup' ? (
+        {(!projectUsers && view !== 'login' && !dbError) || view === 'setup' ? (
           <form onSubmit={handleSetup} className="space-y-4">
             <div className="bg-white p-6 rounded-[32px] shadow-xl border border-slate-100 space-y-4">
               <input type="text" required value={setupInput.manager} onChange={e => setSetupInput({...setupInput, manager: e.target.value})} className="w-full bg-slate-50 border-none rounded-2xl p-4 text-[16px] font-bold outline-none focus:ring-2 focus:ring-slate-900 shadow-inner" placeholder="主理人姓名" />
@@ -274,7 +282,13 @@ export const LoginView: React.FC = () => {
             <button type="submit" className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all uppercase text-xs tracking-widest">Enter Space</button>
              <p className="text-[10px] text-slate-400 mt-4">
                {projectUsers ? "需要重置项目？" : "首次使用？请先"} 
-               <button type="button" onClick={() => setView('setup')} className="text-slate-900 font-bold underline ml-1">初始化项目</button>
+               <button type="button" onClick={() => {
+                 if (dbError) {
+                   setGlobalMsg("网络错误，无法连接到数据库。");
+                 } else {
+                   setView('setup');
+                 }
+               }} className="text-slate-900 font-bold underline ml-1">初始化项目</button>
              </p>
           </form>
         )}
